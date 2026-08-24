@@ -1,0 +1,46 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>dev.gaphunter.apachehttpclientreusecompanion</id>
+    <name>Apache HttpClient Reuse Companion</name>
+    <vendor>Gap Hunter Labs</vendor>
+    <description><![CDATA[
+        <p>Warning icon on a <code>HttpClients.createDefault()</code>,
+        <code>HttpClients.createSystem()</code>, or
+        <code>HttpClients.custom().build()</code> construction (Apache
+        HttpClient, both the 4.x <code>org.apache.http</code> and 5.x
+        <code>org.apache.hc.client5.http</code> packages use
+        <code>HttpClients</code> as the factory class) written inside a
+        regular method body -- Apache's own javadoc annotates
+        <code>CloseableHttpClient</code>
+        <code>@Contract(threading = ThreadingBehavior.SAFE)</code> and
+        states client instances "are expected to be thread safe" and
+        "it is recommended that the same instance of this class is
+        reused for multiple request executions". Building one inside a
+        regular method means a brand new connection pool on every
+        call.</p>
+        <p><b>100% static text/PSI analysis</b> -- matches by simple
+        text, so it works whether the real Apache HttpClient jar (4.x
+        or 5.x) is on the classpath or not. Java and Kotlin.</p>
+        <p>Stated honestly: v0.1 only flags the "build from scratch"
+        shape -- a client obtained by reference from an existing shared
+        instance/dependency injection is never flagged (correctly,
+        since it isn't the anti-pattern this plugin targets).</p>
+        <p>Free. No license nags, no telemetry, no network calls.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK1="true" supportsK2="true"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="JAVA"
+            implementationClass="dev.gaphunter.apachehttpclientreusecompanion.gutter.ClientBuiltPerCallLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="kotlin"
+            implementationClass="dev.gaphunter.apachehttpclientreusecompanion.gutter.ClientBuiltPerCallLineMarkerProvider"/>
+        <notificationGroup id="Apache HttpClient Reuse Companion" displayType="BALLOON"/>
+    </extensions>
+</idea-plugin>
